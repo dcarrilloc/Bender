@@ -22,7 +22,7 @@ class Bender {
 
 class Map {
     private String mapString;
-    private char[][] map;
+    private String[][] map;
     private Vector coordinatesBender; //actual
     private Vector finish;
     private List<Vector> inverter;
@@ -39,25 +39,28 @@ class Map {
 
         // calculam la altura del mapa
         int height = 1;
-        while (width * height <= mapLength) {
+        while (width * height < mapLength) {
             height++;
         }
         height--;
 
-        this.map = new char[height][width];
+        System.out.println("Anchura: " + width + "\n Altura: " + height);
+
+        this.map = new String[height][width];
         this.mapString = map;
         fillMap();
-        System.out.println(Arrays.deepToString(this.map));
     }
 
     private void fillMap() {
         int counter = 0;
         for (int i = 0; i < this.map.length; i++) {
-            for (int j = 0; j < this.map[0].length; j++) {
-                this.map[i][j] = mapString.charAt(counter);
-                counter ++;
+            for (int j = 0; j < this.map[0].length; j++, counter++) {
+                if (this.mapString.charAt(counter) != '\n') {
+                    this.map[i][j] = String.valueOf(this.mapString.charAt(counter));
+                } else {
+                    j--;
+                }
             }
-            counter++;
         }
     }
 }
