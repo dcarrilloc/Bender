@@ -2,7 +2,7 @@ import java.util.*;
 
 class Bender {
     private Mapping mapping;
-    private Map<Character,Vector> movement = new HashMap<>();
+    private Map<Character, Vector> movement = new HashMap<>();
 
 
     // Constructor: ens passen el mapa en forma d'String
@@ -25,7 +25,9 @@ class Bender {
         StringBuilder result = new StringBuilder();
         Vector actualBender = actionMap.getCoordinatesBender();
         Vector finish = actionMap.getFinish();
-        char actualDirection = 'S';
+        char[] collection = {'S', 'E', 'N', 'W'};
+        int index = 0;
+        char actualDirection = collection[index];
 
         // mentre que el robot no arribi a la meta
         while (!actualBender.equals(finish)) {
@@ -33,10 +35,16 @@ class Bender {
             if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == ' ') {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
                 result.append(actualDirection);
-            } else if(actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
-                //TODO
+            } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
+                index = 0;
+                actualDirection = collection[index];
+                while (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
+                    index++;
+                    actualDirection = collection[index];
+                }
             } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'T') {
-                //TODO
+                actionMap.setCoordinatesBender(actionMap.getTeleporters().get(0));
+                result.append(actualDirection);
             } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'I') {
                 //TODO
             } else {
@@ -133,6 +141,10 @@ class Mapping {
 
     public char[][] getMap() {
         return map;
+    }
+
+    public List<Vector> getTeleporters() {
+        return teleporters;
     }
 
     public void setCoordinatesBender(Vector coordinatesBender) {
