@@ -26,7 +26,6 @@ class Bender {
         Vector actualBender = actionMap.getCoordinatesBender();
         Vector finish = actionMap.getFinish();
         char actualDirection = 'S';
-        int index = 0;
 
         // mentre que el robot no arribi a la meta
         while (!actualBender.equals(finish)) {
@@ -63,30 +62,44 @@ class Mapping {
     public Mapping(String map) {
         int mapLength = map.length();
         int width = 0;
-
-        // calculam l'amplada del mapa
-        while(map.charAt(width) == '#') {
-            width++;
-        }
-
-        // calculam la altura del mapa
         int height = 1;
-        while (width * height < mapLength) {
-            height++;
+
+        // calculam l'amplada màxima del mapa
+        int spaceCounter = 0;
+        int counter = 0;
+        for (int i = 0; i < mapLength; i++) {
+            if (map.charAt(i) != '\n') {
+                counter++;
+            } else {
+                if (counter > width) {
+                    width = counter;
+                }
+                height++;
+                counter = 0;
+            }
         }
-        height--;
 
         this.map = new char[height][width];
         this.mapString = map;
+
+
+        System.out.println("Altura: " + height);
+        System.out.println("Amplada: " + width);
+
+        System.out.println(this.mapString);
+        System.out.println("-------------------------------");
         fillMap();
+        System.out.println(Arrays.deepToString(this.map));
     }
 
     private void fillMap() {
         int counter = 0;
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[0].length; j++, counter++) {
-                if (this.mapString.charAt(counter) != '\n') {
+                if (counter < this.mapString.length() && this.mapString.charAt(counter) != '\n') {
                     this.map[i][j] = this.mapString.charAt(counter);
+
+
 
                     // mira si troba el robot
                     if (this.mapString.charAt(counter) == 'X') {
@@ -109,8 +122,23 @@ class Mapping {
                     }
                 } else {
                     j--;
+                    while (j < this.map[i].length - 1) {
+                        j++;
+                        if (this.mapString.charAt(counter) != '\n') {
+                            this.map[i][j] = this.mapString.charAt(counter);
+                            counter++;
+                        }
+                    }
                 }
             }
+
+            if (this.mapString.charAt(counter) == '\n') counter++;
+
+            // sout de cada linea
+            for (int j = 0; j < this.map[i].length; j++) {
+                System.out.print(this.map[i][j]);
+            }
+            System.out.print("\n");
         }
     }
 
