@@ -89,13 +89,33 @@ class Mapping {
         System.out.println(this.mapString);
         System.out.println("-------------------------------");
         fillMap();
-        System.out.println(Arrays.deepToString(this.map));
+
+        for (int i = 0; i < this.map.length; i++) {
+            for (int j = 0; j < this.map[0].length; j++) {
+                System.out.print(this.map[i][j]);
+            }
+            System.out.println();
+        }
     }
 
     private void fillMap() {
         int counter = 0;
         for (int i = 0; i < this.map.length; i++) {
-            for (int j = 0; j < this.map[0].length; j++, counter++) {
+            for (int j = 0; j < this.map[0].length; j++) {
+
+                if (this.mapString.charAt(counter) != '\n') {
+                    // si el caràcter és diferent a un salt de linia
+                    this.map[i][j] = this.mapString.charAt(counter);
+                    counter++;
+
+                } else {
+                    // si el caràcter és un salt de linia
+                    i--;
+                    counter++;
+                    break;
+                }
+
+                /*
                 if (counter < this.mapString.length() && this.mapString.charAt(counter) != '\n') {
                     this.map[i][j] = this.mapString.charAt(counter);
 
@@ -130,15 +150,9 @@ class Mapping {
                         }
                     }
                 }
-            }
 
-            if (this.mapString.charAt(counter) == '\n') counter++;
-
-            // sout de cada linea
-            for (int j = 0; j < this.map[i].length; j++) {
-                System.out.print(this.map[i][j]);
+                */
             }
-            System.out.print("\n");
         }
     }
 
