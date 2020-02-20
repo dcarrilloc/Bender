@@ -99,7 +99,7 @@ class Mapping {
                         inverter.add(new Vector(i, j));
                     }
                     // mira si ha trobat la meta
-                    if (this.mapString.charAt(counter) == 'T') {
+                    if (this.mapString.charAt(counter) == '$') {
                         finish = new Vector(i, j);
                     }
                     // mira si ha trobat el bender
