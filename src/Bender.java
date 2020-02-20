@@ -65,7 +65,6 @@ class Mapping {
         int height = 1;
 
         // calculam l'amplada màxima del mapa
-        int spaceCounter = 0;
         int counter = 0;
         for (int i = 0; i < mapLength; i++) {
             if (map.charAt(i) != '\n') {
@@ -81,77 +80,45 @@ class Mapping {
 
         this.map = new char[height][width];
         this.mapString = map;
-
-
-        System.out.println("Altura: " + height);
-        System.out.println("Amplada: " + width);
-
-        System.out.println(this.mapString);
-        System.out.println("-------------------------------");
         fillMap();
-
-        for (int i = 0; i < this.map.length; i++) {
-            for (int j = 0; j < this.map[0].length; j++) {
-                System.out.print(this.map[i][j]);
-            }
-            System.out.println();
-        }
     }
 
     private void fillMap() {
         int counter = 0;
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[0].length; j++) {
-
                 if (this.mapString.charAt(counter) != '\n') {
                     // si el caràcter és diferent a un salt de linia
+
+                    // mira si ha trobat un teleporter
+                    if (this.mapString.charAt(counter) == 'T') {
+                        teleporters.add(new Vector(i, j));
+                    }
+                    // mira si ha trobat un inverter
+                    if (this.mapString.charAt(counter) == 'I') {
+                        inverter.add(new Vector(i, j));
+                    }
+                    // mira si ha trobat la meta
+                    if (this.mapString.charAt(counter) == 'T') {
+                        finish = new Vector(i, j);
+                    }
+                    // mira si ha trobat el bender
+                    if (this.mapString.charAt(counter) == 'X') {
+                        coordinatesBender = new Vector(i, j);
+                    }
                     this.map[i][j] = this.mapString.charAt(counter);
                     counter++;
-
+                    if (counter == this.mapString.length()) break;
+                    if (j == this.map[0].length - 1 && this.mapString.charAt(counter) == '\n') counter++;
                 } else {
-                    // si el caràcter és un salt de linia
-                    i--;
+                    // si el caràcter és un salt de linia afegim els espais necessaris
+                    while (j < this.map[0].length) {
+                        this.map[i][j] = ' ';
+                        j++;
+                    }
                     counter++;
                     break;
                 }
-
-                /*
-                if (counter < this.mapString.length() && this.mapString.charAt(counter) != '\n') {
-                    this.map[i][j] = this.mapString.charAt(counter);
-
-
-
-                    // mira si troba el robot
-                    if (this.mapString.charAt(counter) == 'X') {
-                        this.coordinatesBender = new Vector(i, j);
-                    }
-
-                    // mira si troba inverters
-                    if (this.mapString.charAt(counter) == 'I') {
-                        this.inverter.add(new Vector(i, j));
-                    }
-
-                    // mira si troba teleporters
-                    if (this.mapString.charAt(counter) == 'T') {
-                        this.teleporters.add(new Vector(i, j));
-                    }
-
-                    // mira si troba la meta
-                    if (this.mapString.charAt(counter) == '$') {
-                        this.finish = new Vector(i, j);
-                    }
-                } else {
-                    j--;
-                    while (j < this.map[i].length - 1) {
-                        j++;
-                        if (this.mapString.charAt(counter) != '\n') {
-                            this.map[i][j] = this.mapString.charAt(counter);
-                            counter++;
-                        }
-                    }
-                }
-
-                */
             }
         }
     }
