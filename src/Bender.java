@@ -26,53 +26,64 @@ class Bender {
         Vector finish = actionMap.getFinish();
         char[] collection = {'S', 'E', 'N', 'W'};
         int index = 0;
-        char actualDirection = collection[index];
+        char benderCourse = collection[index];
         boolean inverterState = true;
-        int impossibleMaps = 0;
+        int benderCaught = 0;
+
+        Map<Character, List<Vector>> positions = new HashMap<>();
+        positions.put('S', new ArrayList<>());
+        positions.put('E', new ArrayList<>());
+        positions.put('N', new ArrayList<>());
+        positions.put('W', new ArrayList<>());
 
         // mentre que el robot no arribi a la meta
         while (!actualBender.equals(finish)) {
             // si la següent posició està buida avançarem el robot
-            if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == ' ') {
-                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
-                result.append(actualDirection);
-            } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
+            if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == ' ') {
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
+                positions.get(benderCourse).add(actionMap.getCoordinatesBender());
+                result.append(benderCourse);
+            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == '#') {
                 if (inverterState) {
                     index = 0;
                 } else {
                     index = 2;
                 }
-                actualDirection = collection[index];
-                while (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
+                benderCourse = collection[index];
+                while (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == '#') {
                     if (index == 3) index = -1;
                     index++;
-                    actualDirection = collection[index];
-                    impossibleMaps++;
-                    if (impossibleMaps == 4) {
+                    benderCourse = collection[index];
+                    benderCaught++;
+                    if (benderCaught == 4) {
                         return null;
                     }
                 }
-                impossibleMaps = 0;
-            } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'T') {
-                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
+                benderCaught = 0;
+            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'T') {
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
                 actualBender = actionMap.getCoordinatesBender();
-                result.append(actualDirection);
+                result.append(benderCourse);
                 actionMap.setCoordinatesBender(findTeleporter());
-            } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'I') {
-                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
-                result.append(actualDirection);
+                positions.get(benderCourse).add(actionMap.getCoordinatesBender());
+            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'I') {
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
+                positions.get(benderCourse).add(actionMap.getCoordinatesBender());
+                result.append(benderCourse);
                 if (inverterState) {
                     inverterState = false;
-                    index = 2;
                 } else {
                     inverterState = true;
-                    index = 0;
                 }
             } else {
-                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
-                result.append(actualDirection);
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
+                positions.get(benderCourse).add(actionMap.getCoordinatesBender());
+                result.append(benderCourse);
             }
             actualBender = actionMap.getCoordinatesBender();
+            if (impossibleMap(positions)) {
+                return null;
+            }
         }
         return result.toString();
     }
@@ -94,6 +105,29 @@ class Bender {
             }
         }
         return result;
+    }
+
+    // Aquesta funcio retornarà true o false si troba que el robot
+    // ha passat per la mateixa coordenada amb la mateixa direcció
+    // anteriorment. En aquest cas, el mapa és impossible.
+    public boolean impossibleMap(Map<Character, List<Vector>> positions) {
+        Iterator<Map.Entry<Character, List<Vector>>> mapIt = positions.entrySet().iterator();
+
+        char[] index = new char[4];
+        for (int i = 0; i < index.length; i++) {
+            index[i] = mapIt.next().getKey();
+
+            List<Vector> vectorList = positions.get(index[i]);
+
+            for (int j = 0; j < vectorList.size() - 1; j++) {
+                for (int k = j + 1; k < vectorList.size(); k++) {
+                    if (vectorList.get(j).equals(vectorList.get(k))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
 
