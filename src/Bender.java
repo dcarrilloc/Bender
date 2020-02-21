@@ -68,7 +68,6 @@ class Bender {
                     inverterState = true;
                     index = 0;
                 }
-                actualDirection = collection[index];
             } else {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
                 result.append(actualDirection);
@@ -90,7 +89,7 @@ class Bender {
         while (it.hasNext()) {
             current = it.next();
             sub = bender.sub(current);
-            if ((sub.getX() + sub.getY() < result.sub(current).getX() + result.sub(current).getY() && sub.getX() + sub.getY() != 0)) {
+            if ((sub.getX() + sub.getY() < bender.sub(result).getX() + bender.sub(result).getY() && sub.getX() + sub.getY() != 0)) {
                 result = current;
             }
         }
