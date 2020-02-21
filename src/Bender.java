@@ -1,7 +1,7 @@
 import java.util.*;
 
 class Bender {
-    private Mapping mapping;
+    private Mapping actionMap;
     private Map<Character, Vector> movement = new HashMap<>();
 
 
@@ -12,7 +12,7 @@ class Bender {
         movement.put('N', new Vector(-1, 0));
         movement.put('W', new Vector(0, -1));
 
-        this.mapping = new Mapping(map);
+        this.actionMap = new Mapping(map);
     }
 
     // Navegar fins a l'objectiu («$»).
@@ -21,13 +21,14 @@ class Bender {
     // els valors «S», «N», «W» o «E»,
     // segons la posició del robot a cada moment.
     public String run() {
-        Mapping actionMap = new Mapping(this.mapping.toString());
         StringBuilder result = new StringBuilder();
         Vector actualBender = actionMap.getCoordinatesBender();
         Vector finish = actionMap.getFinish();
         char[] collection = {'S', 'E', 'N', 'W'};
         int index = 0;
         char actualDirection = collection[index];
+        boolean inverterState = true;
+        int impossibleMaps = 0;
 
         // mentre que el robot no arribi a la meta
         while (!actualBender.equals(finish)) {
@@ -36,26 +37,64 @@ class Bender {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
                 result.append(actualDirection);
             } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
-                index = 0;
+                if (inverterState) {
+                    index = 0;
+                } else {
+                    index = 2;
+                }
                 actualDirection = collection[index];
                 while (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == '#') {
+                    if (index == 3) index = -1;
                     index++;
                     actualDirection = collection[index];
+                    impossibleMaps++;
+                    if (impossibleMaps == 4) {
+                        return null;
+                    }
                 }
+                impossibleMaps = 0;
             } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'T') {
-                actionMap.setCoordinatesBender(actionMap.getTeleporters().get(0));
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
+                actualBender = actionMap.getCoordinatesBender();
                 result.append(actualDirection);
+                actionMap.setCoordinatesBender(findTeleporter());
             } else if (actionMap.getMap()[actualBender.add(movement.get(actualDirection)).getX()][actualBender.add(movement.get(actualDirection)).getY()] == 'I') {
-                //TODO
+                actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
+                result.append(actualDirection);
+                if (inverterState) {
+                    inverterState = false;
+                    index = 2;
+                } else {
+                    inverterState = true;
+                    index = 0;
+                }
+                actualDirection = collection[index];
             } else {
-                // ha arribat al final
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(actualDirection)));
                 result.append(actualDirection);
             }
             actualBender = actionMap.getCoordinatesBender();
         }
-
         return result.toString();
+    }
+
+    // Aquesta funció retornarà el teleporter més proper del robot
+    public Vector findTeleporter() {
+        Vector bender = actionMap.getCoordinatesBender();
+        List<Vector> vectorList = actionMap.getTeleporters();
+        Vector current;
+        Vector sub;
+        Vector result = new Vector(999, 999);
+        Iterator<Vector> it = vectorList.iterator();
+
+        while (it.hasNext()) {
+            current = it.next();
+            sub = bender.sub(current);
+            if ((sub.getX() + sub.getY() < result.sub(current).getX() + result.sub(current).getY() && sub.getX() + sub.getY() != 0)) {
+                result = current;
+            }
+        }
+        return result;
     }
 }
 
@@ -129,6 +168,18 @@ class Mapping {
                 }
             }
         }
+
+        System.out.println("Teleporters: " + teleporters.toString());
+        System.out.println("Inverters: " + inverter.toString());
+        System.out.println("Robot: " + getCoordinatesBender());
+        System.out.println("Meta: " + getFinish());
+
+        for (int i = 0; i < this.map.length; i++) {
+            for (int j = 0; j < this.map[0].length; j++) {
+                System.out.print(this.map[i][j]);
+            }
+            System.out.println();
+        }
     }
 
     public Vector getCoordinatesBender() {
@@ -188,6 +239,12 @@ class Vector {
         return new Vector(this.x + x, this.y + y);
     }
 
+    public Vector sub(Vector v) {
+        int x = v.getX();
+        int y = v.getY();
+        return new Vector(Math.abs(this.x - x), Math.abs(this.y - y));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof Vector) {
@@ -195,11 +252,6 @@ class Vector {
             return this.x == v.x && this.y == v.y;
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
     }
 
     @Override
