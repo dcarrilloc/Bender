@@ -205,18 +205,6 @@ class Mapping {
                 }
             }
         }
-
-        System.out.println("Teleporters: " + teleporters.toString());
-        System.out.println("Inverters: " + inverter.toString());
-        System.out.println("Robot: " + getCoordinatesBender());
-        System.out.println("Meta: " + getFinish());
-
-        for (int i = 0; i < this.map.length; i++) {
-            for (int j = 0; j < this.map[0].length; j++) {
-                System.out.print(this.map[i][j]);
-            }
-            System.out.println();
-        }
     }
 
     public Vector getCoordinatesBender() {
