@@ -5,7 +5,7 @@ class Bender {
     private Map<Character, Vector> movement = new HashMap<>();
 
 
-    // Constructor: ens passen el mapa en forma d'String
+    // constructor: ens passen el mapa en forma d'String
     public Bender(String map) {
         movement.put('S', new Vector(1, 0));
         movement.put('E', new Vector(0, 1));
@@ -15,7 +15,7 @@ class Bender {
         this.actionMap = new Mapping(map);
     }
 
-    // Navegar fins a l'objectiu («$»).
+    // navegar fins a l'objectiu («$»).
     // El valor retornat pel mètode consisteix en una cadena de
     // caràcters on cada lletra pot tenir
     // els valors «S», «N», «W» o «E»,
@@ -43,7 +43,9 @@ class Bender {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
                 positions.get(benderCourse).add(actionMap.getCoordinatesBender());
                 result.append(benderCourse);
-            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == '#') {
+            }
+            // si el robot es troba amb una paret
+            else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == '#') {
                 if (inverterState) {
                     index = 0;
                 } else {
@@ -55,18 +57,22 @@ class Bender {
                     index++;
                     benderCourse = collection[index];
                     benderCaught++;
+                    // comprovam que el robot no es quedi atrapat entre 4 parets
                     if (benderCaught == 4) {
                         return null;
                     }
                 }
                 benderCaught = 0;
-            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'T') {
+            }
+            // si el robot es troba amb un teletransportador
+            else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'T') {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
-                actualBender = actionMap.getCoordinatesBender();
                 result.append(benderCourse);
                 actionMap.setCoordinatesBender(findTeleporter());
                 positions.get(benderCourse).add(actionMap.getCoordinatesBender());
-            } else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'I') {
+            }
+            // si el robot es troba amb un inversor
+            else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'I') {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
                 positions.get(benderCourse).add(actionMap.getCoordinatesBender());
                 result.append(benderCourse);
@@ -75,12 +81,15 @@ class Bender {
                 } else {
                     inverterState = true;
                 }
-            } else {
+            }
+            // arribarà quan passi per la seva posició inicial
+            else {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
                 positions.get(benderCourse).add(actionMap.getCoordinatesBender());
                 result.append(benderCourse);
             }
             actualBender = actionMap.getCoordinatesBender();
+            // comprovam que no hagi entrat en un bucle infinit
             if (impossibleMap(positions)) {
                 return null;
             }
@@ -112,13 +121,10 @@ class Bender {
     // anteriorment. En aquest cas, el mapa és impossible.
     public boolean impossibleMap(Map<Character, List<Vector>> positions) {
         Iterator<Map.Entry<Character, List<Vector>>> mapIt = positions.entrySet().iterator();
-
         char[] index = new char[4];
         for (int i = 0; i < index.length; i++) {
             index[i] = mapIt.next().getKey();
-
             List<Vector> vectorList = positions.get(index[i]);
-
             for (int j = 0; j < vectorList.size() - 1; j++) {
                 for (int k = j + 1; k < vectorList.size(); k++) {
                     if (vectorList.get(j).equals(vectorList.get(k))) {
@@ -134,7 +140,7 @@ class Bender {
 class Mapping {
     private String mapString;
     private char[][] map;
-    private Vector coordinatesBender; //actual
+    private Vector coordinatesBender;
     private Vector finish;
     private List<Vector> inverter = new ArrayList<>();
     private List<Vector> teleporters = new ArrayList<>();
@@ -144,7 +150,7 @@ class Mapping {
         int width = 0;
         int height = 1;
 
-        // calculam l'amplada màxima del mapa
+        // calculam l'amplada i l'altura del mapa
         int counter = 0;
         for (int i = 0; i < mapLength; i++) {
             if (map.charAt(i) != '\n') {
@@ -157,9 +163,8 @@ class Mapping {
                 counter = 0;
             }
         }
-
-        this.map = new char[height][width];
         this.mapString = map;
+        this.map = new char[height][width];
         fillMap();
     }
 
@@ -167,22 +172,21 @@ class Mapping {
         int counter = 0;
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[0].length; j++) {
+                // si el caràcter és diferent a un salt de linia
                 if (this.mapString.charAt(counter) != '\n') {
-                    // si el caràcter és diferent a un salt de linia
-
-                    // mira si ha trobat un teleporter
+                    // mira si ha trobat un teleporter i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == 'T') {
                         teleporters.add(new Vector(i, j));
                     }
-                    // mira si ha trobat un inverter
+                    // mira si ha trobat un inverter i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == 'I') {
                         inverter.add(new Vector(i, j));
                     }
-                    // mira si ha trobat la meta
+                    // mira si ha trobat la meta i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == '$') {
                         finish = new Vector(i, j);
                     }
-                    // mira si ha trobat el bender
+                    // mira si ha trobat el bender i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == 'X') {
                         coordinatesBender = new Vector(i, j);
                     }
@@ -256,14 +260,6 @@ class Vector {
 
     public int getY() {
         return y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 
     public Vector add(Vector movement) {
