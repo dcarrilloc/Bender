@@ -36,6 +36,9 @@ class Bender {
         positions.put('N', new ArrayList<>());
         positions.put('W', new ArrayList<>());
 
+        // comprovacions del mapa
+        if (!actionMap.validMap()) return null;
+
         // mentre que el robot no arribi a la meta
         while (!actualBender.equals(finish)) {
             // si la següent posició està buida avançarem el robot
@@ -205,6 +208,18 @@ class Mapping {
                 }
             }
         }
+    }
+
+    // mètode per comprovar si un mapa és vàlid
+    public boolean validMap() {
+        for (int i = 0; i < this.map.length - 1; i++) {
+            for (int j = 0; j < this.map[0].length; j++) {
+                if (this.map[i][j] != ' ' && this.map[i][j] != '#' && this.map[i][j] != 'T' && this.map[i][j] != 'I' && this.map[i][j] != 'X' && this.map[i][j] != '$') {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public Vector getCoordinatesBender() {
