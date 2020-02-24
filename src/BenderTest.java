@@ -338,7 +338,7 @@ public class BenderTest {
                 "#   $ #\n" +
                 "#######";
         Bender bender = new Bender(mapa);
-        assertEquals("SSSS", bender.run());
+        assertEquals("SSS", bender.run());
     }
 
     @Test
