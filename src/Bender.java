@@ -106,6 +106,8 @@ class Bender {
         Vector current;
         Vector sub;
         Vector result = new Vector(999, 999);
+        double angle = 366;
+        double currentAngle = 0;
 
         for (Vector vector : vectorList) {
             current = vector;
@@ -123,9 +125,20 @@ class Bender {
 
         // Un pic emmagatzemat els teleportadors que estan a la
         // mateixa distància, aplicarem la regla del rellotje.
-        
-
-
+        for (Vector actual : sameDistanceTeleporters) {
+            // Miram a quina meitat es troba el teletransportador.
+            if (actual.getY() >= bender.getY()) {
+                // Si es troba a la meitat de l'esquerra del robot.
+                currentAngle = actual.angle(bender, new Vector(0, 1));
+            } else {
+                // Si es troba a la meitat de la dreta del robot.
+                currentAngle = actual.angle(bender, new Vector(0, -1)) + 180;
+            }
+            if (currentAngle < angle) {
+                angle = currentAngle;
+                result = actual;
+            }
+        }
         return result;
     }
 
@@ -288,6 +301,14 @@ class Vector {
         return y;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     // Retorna el vector resultant de la suma de dos vectors.
     public Vector add(Vector movement) {
         int x = movement.getX();
@@ -300,6 +321,16 @@ class Vector {
         int x = v.getX();
         int y = v.getY();
         return new Vector(Math.abs(this.x - x), Math.abs(this.y - y));
+    }
+
+    // Retorna l'angle entre dos vectors segons la posició del robot.
+    public double angle(Vector bender, Vector v) {
+        // Primer de tot corregirem el Vector actual a partir de les coordenades del robot.
+        Vector current = new Vector(this.getY() - bender.getY(), bender.getX() - this.getX());
+
+        double result = (current.getX() * v.getX() + current.getY() * v.getY()) / ((Math.sqrt(Math.pow(current.getX(), 2) + Math.pow(current.getY(), 2))) * (Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getY(), 2))));
+        result = Math.toDegrees(Math.acos(result));
+        return result;
     }
 
     // Compara dos vectors i retorna TRUE si són iguals i FALSE si no ho son.
