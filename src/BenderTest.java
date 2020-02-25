@@ -327,6 +327,7 @@ public class BenderTest {
     }
 
     @Test
+    @Ignore
     public void test20() {
         String mapa = "" +
                 "#######\n" +

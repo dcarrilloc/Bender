@@ -123,6 +123,7 @@ class Bender {
     // ha passat per la mateixa coordenada amb la mateixa direcció
     // anteriorment. En aquest cas, el mapa és impossible.
     public boolean impossibleMap(Map<Character, List<Vector>> positions) {
+        int counter = 0;
         Iterator<Map.Entry<Character, List<Vector>>> mapIt = positions.entrySet().iterator();
         char[] index = new char[4];
         for (int i = 0; i < index.length; i++) {
@@ -131,9 +132,13 @@ class Bender {
             for (int j = 0; j < vectorList.size() - 1; j++) {
                 for (int k = j + 1; k < vectorList.size(); k++) {
                     if (vectorList.get(j).equals(vectorList.get(k))) {
-                        return true;
+                        counter++;
                     }
                 }
+                if (counter > 1) {
+                    return true;
+                }
+                counter = 0;
             }
         }
         return false;
