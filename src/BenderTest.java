@@ -477,7 +477,6 @@ public class BenderTest {
             finalMap += list.get(i).toString() + "\n";
         }
         finalMap += list.get(list.size()-1);
-        System.out.println(finalMap);
         return finalMap;
     }
 

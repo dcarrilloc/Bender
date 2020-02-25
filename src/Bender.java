@@ -102,18 +102,30 @@ class Bender {
     public Vector findTeleporter() {
         Vector bender = actionMap.getCoordinatesBender();
         List<Vector> vectorList = actionMap.getTeleporters();
+        List<Vector> sameDistanceTeleporters = new ArrayList<>();
         Vector current;
         Vector sub;
         Vector result = new Vector(999, 999);
-        Iterator<Vector> it = vectorList.iterator();
 
-        while (it.hasNext()) {
-            current = it.next();
+        for (Vector vector : vectorList) {
+            current = vector;
             sub = bender.sub(current);
             if ((sub.getX() + sub.getY() < bender.sub(result).getX() + bender.sub(result).getY() && sub.getX() + sub.getY() != 0)) {
+                sameDistanceTeleporters.clear();
+                sameDistanceTeleporters.add(current);
                 result = current;
+            } else if (sub.getX() + sub.getY() == bender.sub(result).getX() + bender.sub(result).getY()) {
+                // Si dos teletransportadors estan a la mateixa
+                // aplicam la regla del rellotje per retornar el teleporter adequat.
+                sameDistanceTeleporters.add(current);
             }
         }
+
+        // Un pic emmagatzemat els teleportadors que estan a la
+        // mateixa distància, aplicarem la regla del rellotje.
+        
+
+
         return result;
     }
 
