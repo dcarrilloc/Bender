@@ -323,11 +323,12 @@ class Vector {
         return new Vector(Math.abs(this.x - x), Math.abs(this.y - y));
     }
 
-    // Retorna l'angle entre dos vectors segons la posició del robot.
+    // Retorna l'angle entre el teletransportador i un angle imaginari segons la posició del robot.
     public double angle(Vector bender, Vector v) {
         // Primer de tot corregirem el Vector actual a partir de les coordenades del robot.
         Vector current = new Vector(this.getY() - bender.getY(), bender.getX() - this.getX());
 
+        // Calculam l'angle entre el teletransportador i el Vector v imaginari
         double result = (current.getX() * v.getX() + current.getY() * v.getY()) / ((Math.sqrt(Math.pow(current.getX(), 2) + Math.pow(current.getY(), 2))) * (Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getY(), 2))));
         result = Math.toDegrees(Math.acos(result));
         return result;

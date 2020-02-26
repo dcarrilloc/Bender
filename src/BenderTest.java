@@ -1,4 +1,3 @@
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -330,7 +329,6 @@ public class BenderTest {
     }
 
     @Test
-    @Ignore
     public void test20() {
         String mapa = "" +
                 "#######\n" +
