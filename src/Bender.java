@@ -28,6 +28,7 @@ class Bender {
         char benderCourse = collection[index];
         boolean inverterState = true;
         int benderCaught = 0;
+        int checkingCounter = 0;
 
         Map<Character, List<Vector>> positions = new HashMap<>();
         positions.put('S', new ArrayList<>());
@@ -92,8 +93,17 @@ class Bender {
             }
             actualBender = actionMap.getCoordinatesBender();
 
+            /* enseñar a samuel
+            checkingCounter++;
             // Comprovam que no hagi entrat en un bucle infinit.
-            if (impossibleMap(positions)) return null;
+            if (checkingCounter > 99 && impossibleMap(positions)) {
+                return null;
+            } else if (checkingCounter > 99) {
+                checkingCounter = 0;
+            }
+
+             */
+            if (impossibleMap(positions)) return  null;
         }
         return result.toString();
     }
