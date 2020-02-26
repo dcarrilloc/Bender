@@ -92,8 +92,6 @@ class Bender {
                 result.append(benderCourse);
             }
             actualBender = actionMap.getCoordinatesBender();
-
-            /* enseñar a samuel
             checkingCounter++;
             // Comprovam que no hagi entrat en un bucle infinit.
             if (checkingCounter > 99 && impossibleMap(positions)) {
@@ -101,9 +99,6 @@ class Bender {
             } else if (checkingCounter > 99) {
                 checkingCounter = 0;
             }
-
-             */
-            if (impossibleMap(positions)) return  null;
         }
         return result.toString();
     }
