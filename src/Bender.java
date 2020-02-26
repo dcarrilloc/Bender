@@ -71,7 +71,7 @@ class Bender {
             else if (actionMap.getMap()[actualBender.add(movement.get(benderCourse)).getX()][actualBender.add(movement.get(benderCourse)).getY()] == 'T') {
                 actionMap.setCoordinatesBender(actualBender.add(movement.get(benderCourse)));
                 result.append(benderCourse);
-                actionMap.setCoordinatesBender(findTeleporter());
+                actionMap.setCoordinatesBender(findTeleporter(actionMap.getCoordinatesBender()));
                 positions.get(benderCourse).add(actionMap.getCoordinatesBender());
             }
             // Si el robot es troba amb un inversor canviaran les seves prioritats de direcció.
@@ -109,8 +109,7 @@ class Bender {
     }
 
     // Aquesta funció retornarà les coordenades del teleporter més proper del robot.
-    public Vector findTeleporter() {
-        Vector bender = actionMap.getCoordinatesBender();
+    public Vector findTeleporter(Vector bender) {
         List<Vector> vectorList = actionMap.getTeleporters();
         List<Vector> sameDistanceTeleporters = new ArrayList<>();
         Vector current;
@@ -177,8 +176,9 @@ class Bender {
         return false;
     }
 
-    // Trobar l'objectiu ($) a través del cami més curt.
+    // Trobar la distància més curta per arribar a l'objectiu ($).
     public int bestRun() {
+        // Array que ens dirà si un estat s'ha visitat anteriorment.
         boolean [][] visited = new boolean[this.actionMap.getMap().length][this.actionMap.getMap()[0].length];
 
         // Emplenam el nostre array visited amb false perquè de moment no hem visitat cap estat.
@@ -187,7 +187,6 @@ class Bender {
                 visited[i][j] = false;
             }
         }
-
 
         // Declaram el nostre estat inicial (posició inicial del Bender).
         State initial = new State(actionMap.getCoordinatesBender(), 0);
@@ -204,7 +203,6 @@ class Bender {
         while (!queue.isEmpty()) {
             actual = queue.poll();
             if (actionMap.getMap()[actual.getCoordenates().getX()][actual.getCoordenates().getY()] == '$') {
-                System.out.println(actual.getDistance());
                 return actual.getDistance();
             }
             visited[actual.getCoordenates().getX()][actual.getCoordenates().getY()] = true;
@@ -213,14 +211,21 @@ class Bender {
                 int y = incrementY[i] + actual.getCoordenates().getY();
 
                 // Comprovam que la coordenada adjacent no sobrepassi els limits del mapa,
-                // que no sigui paret (#) i que no estigui visitat
+                // que no sigui paret (#) i que no estigui visitat.
                 if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !visited[x][y]) {
-                    State neighbour = new State(new Vector(x, y), actual.getDistance() + 1);
+                    State neighbour;
+                    if (actionMap.getMap()[x][y] == 'T') {
+                        // Si es troba amb un teleportador, les coordenades de la posició adjacent
+                        // 'nerighbour' seràn les del teleportador més proper trobar a findTeleporter().
+                        neighbour = new State(findTeleporter(new Vector(x, y)), actual.getDistance() + 1);
+                    } else {
+                        neighbour = new State(new Vector(x, y), actual.getDistance() + 1);
+                    }
                     queue.offer(neighbour);
                 }
             }
-
         }
+        // Si no troba cap solució es retornarà -1.
         return -1;
     }
 }
@@ -232,7 +237,6 @@ class Mapping {
     private char[][] map;
     private Vector coordinatesBender;
     private Vector finish;
-    private List<Vector> inverter = new ArrayList<>();
     private List<Vector> teleporters = new ArrayList<>();
 
     // Constructor del mapa.
@@ -270,10 +274,6 @@ class Mapping {
                     // Mira si ha trobat un teleporter i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == 'T') {
                         teleporters.add(new Vector(i, j));
-                    }
-                    // Mira si ha trobat un inverter i guarda les seves coordenades
-                    if (this.mapString.charAt(counter) == 'I') {
-                        inverter.add(new Vector(i, j));
                     }
                     // Mira si ha trobat la meta i guarda les seves coordenades
                     if (this.mapString.charAt(counter) == '$') {
@@ -407,6 +407,7 @@ class Vector {
     }
 }
 
+// Objecte State per definir l'estat de cada cel·la dins un mapa.
 class State {
     private Vector coordenates;
     private int distance;
