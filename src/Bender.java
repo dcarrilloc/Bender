@@ -172,6 +172,8 @@ class Bender {
     }
 
     // Trobar la distància més curta per arribar a l'objectiu ($).
+
+    /*
     public int bestRun() {
         // Array que ens dirà si un estat s'ha visitat anteriorment.
         boolean [][] visited = new boolean[this.actionMap.getMap().length][this.actionMap.getMap()[0].length];
@@ -211,7 +213,7 @@ class Bender {
                     State neighbour;
                     if (actionMap.getMap()[x][y] == 'T') {
                         // Si es troba amb un teleportador, les coordenades de la posició adjacent
-                        // 'nerighbour' seràn les del teleportador més proper trobar a findTeleporter().
+                        // 'neighbour' seràn les del teleportador més proper trobar a findTeleporter().
                         neighbour = new State(findTeleporter(new Vector(x, y)), actual.getDistance() + 1);
                     } else {
                         neighbour = new State(new Vector(x, y), actual.getDistance() + 1);
@@ -222,6 +224,41 @@ class Bender {
         }
         // Si no troba cap solució es retornarà -1.
         return -1;
+    }
+
+     */
+
+    public int bestRun() {
+        List<Cell> openList = new ArrayList<>();
+        List<Cell> closedList = new ArrayList<>();
+        Cell actual = new Cell(actionMap.getCoordinatesBender(), new Vector(actionMap.getCoordinatesBender().getX(), actionMap.getCoordinatesBender().getY()), actionMap.getFinish());
+
+        // Per incrementar coordenades en x i y.
+        int [] incrementX = {0, 0, 1, -1};
+        int [] incrementY = {1, -1, 0, 0};
+
+        closedList.add(actual);
+
+        // Ficar en openList tots els veïns de actual
+        for (int i = 0; i < 4; i++) {
+            int x = incrementX[i] + actual.getPosition().getX();
+            int y = incrementY[i] + actual.getPosition().getY();
+            
+            // falta añadir que no esté en openList
+            Cell neighbour;
+            if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length) {
+                if (actionMap.getMap()[x][y] == 'T') {
+                    neighbour = new Cell(findTeleporter(actual.getPosition()), new Vector(actual.getPosition().getX(), actual.getPosition().getY()), actionMap.getFinish());
+                } else {
+                    neighbour = new Cell(new Vector(x, y), new Vector(actual.getPosition().getX(), actual.getPosition().getY()), actionMap.getFinish());
+                }
+                openList.add(neighbour);
+            }
+        }
+
+
+
+        return 0;
     }
 }
 
@@ -418,5 +455,51 @@ class State {
 
     public int getDistance() {
         return distance;
+    }
+}
+
+class Cell {
+    private Vector position;
+    private Vector backCell;
+    private Vector finish;
+    private double f;
+    private int g;
+    private double h;
+
+    public Cell(Vector position, Vector backCell, Vector finish) {
+        this.position = position;
+        this.finish = finish;
+        this.g = 1;
+        this.backCell = backCell;
+        this.h = Math.sqrt(Math.pow(finish.getX() - position.getY(), 2) + Math.pow(finish.getY() - position.getY(), 2));
+        this.f = this.g + this.h;
+    }
+
+    public Vector getPosition() {
+        return position;
+    }
+
+    public double getF() {
+        return f;
+    }
+
+    public int getG() {
+        return g;
+    }
+
+    public double getH() {
+        return h;
+    }
+
+    public void setF(int f) {
+        this.f = f;
+    }
+
+    public void setG(int g) {
+        this.g = g;
+    }
+
+    public void setH(int h) {
+        this.h = h;
     }
 }
