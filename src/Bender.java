@@ -176,6 +176,53 @@ class Bender {
         }
         return false;
     }
+
+    // Trobar l'objectiu ($) a través del cami més curt.
+    public int bestRun() {
+        boolean [][] visited = new boolean[this.actionMap.getMap().length][this.actionMap.getMap()[0].length];
+
+        // Emplenam el nostre array visited amb false perquè de moment no hem visitat cap estat.
+        for (int i = 0; i < visited.length; i++) {
+            for (int j = 0; j < visited[0].length; j++) {
+                visited[i][j] = false;
+            }
+        }
+
+
+        // Declaram el nostre estat inicial (posició inicial del Bender).
+        State initial = new State(actionMap.getCoordinatesBender(), 0);
+        State actual;
+
+        // Cua de tots els possibles estats per els que es passi fins arribar al destí.
+        Queue<State> queue = new LinkedList<>();
+        queue.offer(initial);
+
+        // Per incrementar coordenades en x i y.
+        int [] incrementX = {0, 0, 1, -1};
+        int [] incrementY = {1, -1, 0, 0};
+
+        while (!queue.isEmpty()) {
+            actual = queue.poll();
+            if (actionMap.getMap()[actual.getCoordenates().getX()][actual.getCoordenates().getY()] == '$') {
+                System.out.println(actual.getDistance());
+                return actual.getDistance();
+            }
+            visited[actual.getCoordenates().getX()][actual.getCoordenates().getY()] = true;
+            for (int i = 0; i < 4; i++) {
+                int x = incrementX[i] + actual.getCoordenates().getX();
+                int y = incrementY[i] + actual.getCoordenates().getY();
+
+                // Comprovam que la coordenada adjacent no sobrepassi els limits del mapa,
+                // que no sigui paret (#) i que no estigui visitat
+                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !visited[x][y]) {
+                    State neighbour = new State(new Vector(x, y), actual.getDistance() + 1);
+                    queue.offer(neighbour);
+                }
+            }
+
+        }
+        return -1;
+    }
 }
 
 // Objecte mapa que emprarem per crear el nostre mapa
@@ -357,5 +404,23 @@ class Vector {
     @Override
     public String toString() {
         return "[" + this.x + ", " + this.y + "]";
+    }
+}
+
+class State {
+    private Vector coordenates;
+    private int distance;
+
+    public State(Vector coordenates, int distance) {
+        this.coordenates = coordenates;
+        this.distance = distance;
+    }
+
+    public Vector getCoordenates() {
+        return coordenates;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }
