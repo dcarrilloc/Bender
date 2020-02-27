@@ -254,25 +254,17 @@ class Bender {
                     } else {
                         neighbour = new Cell(new Vector(x, y), actual, actionMap.getFinish());
                     }
-                    neighbour.setG(neighbour.getG() + neighbour.getBackCell().getG());
                     openList.add(neighbour);
                 }
             }
 
             // Comprovam que la meta no estigui dins openList
-            int result = 1;
+            int result = 0;
             for (Cell onGoing : openList) {
                 if (onGoing.getPosition().equals(actionMap.getFinish())) {
-
-                    Cell firstCell = closedList.get(0);
-                    Cell index = closedList.get(closedList.size() - 1);
-
-                    while (!index.equals(firstCell)) {
-                        index = index.getBackCell();
-                        result++;
-                    }
+                    closedList.add(onGoing);
                     System.out.println(result);
-                    return result;
+                    return onGoing.getG();
                 }
             }
 
@@ -292,12 +284,13 @@ class Bender {
             closedList.add(actual);
             openList.remove(index);
 
+            // Miram si millora el pas.
             for (int i = 0; i < 4; i++) {
                 int x = incrementX[i] + actual.getPosition().getX();
                 int y = incrementY[i] + actual.getPosition().getY();
 
                 Cell onGoing = new Cell(new Vector(x, y), actual, new Vector(actionMap.getFinish().getX(), actionMap.getFinish().getY()));
-                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !containsCell(closedList, new Vector(x, y)) && actual.getG() + 1 < onGoing.getG()) {
+                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !containsCell(closedList, new Vector(x, y)) && onGoing.getG() + 1 < actual.getG()) {
                     onGoing.setBackCell(actual);
                     onGoing.setG(1 + actual.getG());
                     onGoing.setF(onGoing.getG() + onGoing.getH());
@@ -521,15 +514,17 @@ class Cell {
     private int g;
     private double h;
 
+    // Constructor general.
     public Cell(Vector position, Cell backCell, Vector finish) {
         this.position = position;
         this.finish = finish;
-        this.g = 1;
         this.backCell = backCell;
-        this.h = Math.sqrt(Math.pow(finish.getX() - position.getY(), 2) + Math.pow(finish.getY() - position.getY(), 2));
+        this.h = Math.sqrt(Math.pow(this.finish.getX() - position.getY(), 2) + Math.pow(this.finish.getY() - position.getY(), 2));
+        this.g = 1 + this.getBackCell().getG();
         this.f = this.g + this.h;
     }
 
+    // Constructor per la primera Cel·la.
     public Cell(Vector position, Vector finish) {
         this.position = position;
         this.finish = finish;
