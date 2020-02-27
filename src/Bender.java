@@ -250,7 +250,7 @@ class Bender {
                 // Si no es surt dels limits del mapa, ni és una paret, ni està ja a openList ni a closeList...
                 if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !containsCell(openList, new Vector(x, y)) && !containsCell(closedList, new Vector(x, y))) {
                     if (actionMap.getMap()[x][y] == 'T') {
-                        neighbour = new Cell(findTeleporter(actual.getPosition()), actual, actionMap.getFinish());
+                        neighbour = new Cell(findTeleporter(new Vector(x, y)), actual, actionMap.getFinish());
                     } else {
                         neighbour = new Cell(new Vector(x, y), actual, actionMap.getFinish());
                     }
