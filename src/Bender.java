@@ -231,34 +231,89 @@ class Bender {
     public int bestRun() {
         List<Cell> openList = new ArrayList<>();
         List<Cell> closedList = new ArrayList<>();
-        Cell actual = new Cell(actionMap.getCoordinatesBender(), new Vector(actionMap.getCoordinatesBender().getX(), actionMap.getCoordinatesBender().getY()), actionMap.getFinish());
+        // Inicialitzam la cel·la on es troba el robot.
+        Cell actual = new Cell(actionMap.getCoordinatesBender(), actionMap.getFinish());
+        Cell neighbour;
+
+        closedList.add(actual);
 
         // Per incrementar coordenades en x i y.
         int [] incrementX = {0, 0, 1, -1};
         int [] incrementY = {1, -1, 0, 0};
 
-        closedList.add(actual);
+        while (true) {
+            // Ficam en openList tots els veïns de actual
+            for (int i = 0; i < 4; i++) {
+                int x = incrementX[i] + actual.getPosition().getX();
+                int y = incrementY[i] + actual.getPosition().getY();
 
-        // Ficar en openList tots els veïns de actual
-        for (int i = 0; i < 4; i++) {
-            int x = incrementX[i] + actual.getPosition().getX();
-            int y = incrementY[i] + actual.getPosition().getY();
-            
-            // falta añadir que no esté en openList
-            Cell neighbour;
-            if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length) {
-                if (actionMap.getMap()[x][y] == 'T') {
-                    neighbour = new Cell(findTeleporter(actual.getPosition()), new Vector(actual.getPosition().getX(), actual.getPosition().getY()), actionMap.getFinish());
-                } else {
-                    neighbour = new Cell(new Vector(x, y), new Vector(actual.getPosition().getX(), actual.getPosition().getY()), actionMap.getFinish());
+                // Si no es surt dels limits del mapa, ni és una paret, ni està ja a openList ni a closeList...
+                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !containsCell(openList, new Vector(x, y)) && !containsCell(closedList, new Vector(x, y))) {
+                    if (actionMap.getMap()[x][y] == 'T') {
+                        neighbour = new Cell(findTeleporter(actual.getPosition()), actual, actionMap.getFinish());
+                    } else {
+                        neighbour = new Cell(new Vector(x, y), actual, actionMap.getFinish());
+                    }
+                    neighbour.setG(neighbour.getG() + neighbour.getBackCell().getG());
+                    openList.add(neighbour);
                 }
-                openList.add(neighbour);
+            }
+
+            // Comprovam que la meta no estigui dins openList
+            int result = 1;
+            for (Cell onGoing : openList) {
+                if (onGoing.getPosition().equals(actionMap.getFinish())) {
+
+                    Cell firstCell = closedList.get(0);
+                    Cell index = closedList.get(closedList.size() - 1);
+
+                    while (!index.equals(firstCell)) {
+                        index = index.getBackCell();
+                        result++;
+                    }
+                    System.out.println(result);
+                    return result;
+                }
+            }
+
+            // Un pic tenim en openList tots els veïns de la cel·la actual elegim la cel·la amb menys F(n).
+            double maxF = 999999999;
+            int index = 0;
+            int counter = 0;
+            for (Cell onGoing : openList) {
+                if (onGoing.getF() < maxF) {
+                    maxF = onGoing.getF();
+                    index = counter;
+                }
+                counter++;
+            }
+            // L'element amb menys F(n) és l'element amb posició 'index' dins openList
+            actual = openList.get(index);
+            closedList.add(actual);
+            openList.remove(index);
+
+            for (int i = 0; i < 4; i++) {
+                int x = incrementX[i] + actual.getPosition().getX();
+                int y = incrementY[i] + actual.getPosition().getY();
+
+                Cell onGoing = new Cell(new Vector(x, y), actual, new Vector(actionMap.getFinish().getX(), actionMap.getFinish().getY()));
+                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !containsCell(closedList, new Vector(x, y)) && actual.getG() + 1 < onGoing.getG()) {
+                    onGoing.setBackCell(actual);
+                    onGoing.setG(1 + actual.getG());
+                    onGoing.setF(onGoing.getG() + onGoing.getH());
+                }
             }
         }
+    }
 
-
-
-        return 0;
+    // Retorna TRUE si cell hi existeix dins la llista i FALSE si no.
+    public boolean containsCell(List<Cell> openList, Vector cell) {
+        for (Cell actual : openList) {
+            if (actual.getPosition().equals(cell)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -460,19 +515,27 @@ class State {
 
 class Cell {
     private Vector position;
-    private Vector backCell;
+    private Cell backCell;
     private Vector finish;
     private double f;
     private int g;
     private double h;
 
-    public Cell(Vector position, Vector backCell, Vector finish) {
+    public Cell(Vector position, Cell backCell, Vector finish) {
         this.position = position;
         this.finish = finish;
         this.g = 1;
         this.backCell = backCell;
         this.h = Math.sqrt(Math.pow(finish.getX() - position.getY(), 2) + Math.pow(finish.getY() - position.getY(), 2));
         this.f = this.g + this.h;
+    }
+
+    public Cell(Vector position, Vector finish) {
+        this.position = position;
+        this.finish = finish;
+        this.g = 0;
+        this.h = 0;
+        this.f = 0;
     }
 
     public Vector getPosition() {
@@ -487,11 +550,19 @@ class Cell {
         return g;
     }
 
+    public Cell getBackCell() {
+        return backCell;
+    }
+
+    public void setBackCell(Cell backCell) {
+        this.backCell = backCell;
+    }
+
     public double getH() {
         return h;
     }
 
-    public void setF(int f) {
+    public void setF(double f) {
         this.f = f;
     }
 
