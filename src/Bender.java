@@ -384,6 +384,8 @@ class Mapping {
     // Comprova si un mapa és vàlid i retorna un
     // booleà TRUE so és vàlid i FALSE si no.
     public boolean validMap() {
+
+        // Comprova que no hi hagi un altre caràcter dels permesos al mapa
         for (int i = 0; i < this.map.length - 1; i++) {
             for (int j = 0; j < this.map[0].length; j++) {
                 if (this.map[i][j] != ' ' && this.map[i][j] != '#' && this.map[i][j] != 'T' && this.map[i][j] != 'I' && this.map[i][j] != 'X' && this.map[i][j] != '$') {
@@ -391,6 +393,21 @@ class Mapping {
                 }
             }
         }
+
+        // Comprova que el mapa sigui un mapa tancat
+        int counter = 0;
+        for (int i = 0; i < this.map.length; i++) {
+            for (int j = 0; j < this.map[0].length; j++) {
+                if (this.map[i][j] == '#') counter++;
+            }
+            if (counter < 2) return false;
+            counter = 0;
+        }
+
+
+        // Comprova que el mapa tengui objectiu i robot
+        if (this.coordinatesBender == null || this.finish == null) return false;
+
         return true;
     }
 
