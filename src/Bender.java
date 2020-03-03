@@ -172,62 +172,6 @@ class Bender {
     }
 
     // Trobar la distància més curta per arribar a l'objectiu ($).
-
-    /*
-    public int bestRun() {
-        // Array que ens dirà si un estat s'ha visitat anteriorment.
-        boolean [][] visited = new boolean[this.actionMap.getMap().length][this.actionMap.getMap()[0].length];
-
-        // Emplenam el nostre array visited amb false perquè de moment no hem visitat cap estat.
-        for (int i = 0; i < visited.length; i++) {
-            for (int j = 0; j < visited[0].length; j++) {
-                visited[i][j] = false;
-            }
-        }
-
-        // Declaram el nostre estat inicial (posició inicial del Bender).
-        State initial = new State(actionMap.getCoordinatesBender(), 0);
-        State actual;
-
-        // Cua de tots els possibles estats per els que es passi fins arribar al destí.
-        Queue<State> queue = new LinkedList<>();
-        queue.offer(initial);
-
-        // Per incrementar coordenades en x i y.
-        int [] incrementX = {0, 0, 1, -1};
-        int [] incrementY = {1, -1, 0, 0};
-
-        while (!queue.isEmpty()) {
-            actual = queue.poll();
-            if (actionMap.getMap()[actual.getCoordenates().getX()][actual.getCoordenates().getY()] == '$') {
-                return actual.getDistance();
-            }
-            visited[actual.getCoordenates().getX()][actual.getCoordenates().getY()] = true;
-            for (int i = 0; i < 4; i++) {
-                int x = incrementX[i] + actual.getCoordenates().getX();
-                int y = incrementY[i] + actual.getCoordenates().getY();
-
-                // Comprovam que la coordenada adjacent no sobrepassi els limits del mapa,
-                // que no sigui paret (#) i que no estigui visitat.
-                if (x >= 0 && x < actionMap.getMap().length && y >= 0 && y < actionMap.getMap()[0].length && actionMap.getMap()[x][y] != '#' && !visited[x][y]) {
-                    State neighbour;
-                    if (actionMap.getMap()[x][y] == 'T') {
-                        // Si es troba amb un teleportador, les coordenades de la posició adjacent
-                        // 'neighbour' seràn les del teleportador més proper trobar a findTeleporter().
-                        neighbour = new State(findTeleporter(new Vector(x, y)), actual.getDistance() + 1);
-                    } else {
-                        neighbour = new State(new Vector(x, y), actual.getDistance() + 1);
-                    }
-                    queue.offer(neighbour);
-                }
-            }
-        }
-        // Si no troba cap solució es retornarà -1.
-        return -1;
-    }
-
-     */
-
     public int bestRun() {
         List<Cell> openList = new ArrayList<>();
         List<Cell> closedList = new ArrayList<>();
@@ -259,11 +203,9 @@ class Bender {
             }
 
             // Comprovam que la meta no estigui dins openList
-            int result = 0;
             for (Cell onGoing : openList) {
                 if (onGoing.getPosition().equals(actionMap.getFinish())) {
                     closedList.add(onGoing);
-                    System.out.println(result);
                     return onGoing.getG();
                 }
             }
@@ -384,7 +326,6 @@ class Mapping {
     // Comprova si un mapa és vàlid i retorna un
     // booleà TRUE so és vàlid i FALSE si no.
     public boolean validMap() {
-
         // Comprova que no hi hagi un altre caràcter dels permesos al mapa
         for (int i = 0; i < this.map.length - 1; i++) {
             for (int j = 0; j < this.map[0].length; j++) {
@@ -404,10 +345,8 @@ class Mapping {
             counter = 0;
         }
 
-
         // Comprova que el mapa tengui objectiu i robot
         if (this.coordinatesBender == null || this.finish == null) return false;
-
         return true;
     }
 
@@ -455,14 +394,6 @@ class Vector {
         return y;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
     // Retorna el vector resultant de la suma de dos vectors.
     public Vector add(Vector movement) {
         int x = movement.getX();
@@ -504,25 +435,7 @@ class Vector {
     }
 }
 
-// Objecte State per definir l'estat de cada cel·la dins un mapa.
-class State {
-    private Vector coordenates;
-    private int distance;
-
-    public State(Vector coordenates, int distance) {
-        this.coordenates = coordenates;
-        this.distance = distance;
-    }
-
-    public Vector getCoordenates() {
-        return coordenates;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-}
-
+// Objecte Cell per definir l'estat de cada cel·la dins un mapa.
 class Cell {
     private Vector position;
     private Cell backCell;
@@ -580,9 +493,5 @@ class Cell {
 
     public void setG(int g) {
         this.g = g;
-    }
-
-    public void setH(int h) {
-        this.h = h;
     }
 }
