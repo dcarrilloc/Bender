@@ -113,6 +113,7 @@ class Bender {
         double angle = 366;
         double currentAngle = 0;
 
+        // Emmagatzemam els teleportadors que estan a la minima distància dins sameDistanceTeleporters
         for (Vector vector : vectorList) {
             current = vector;
             sub = bender.sub(current);
@@ -122,13 +123,13 @@ class Bender {
                 result = current;
             } else if (sub.getX() + sub.getY() == bender.sub(result).getX() + bender.sub(result).getY()) {
                 // Si dos teletransportadors estan a la mateixa
-                // aplicam la regla del rellotje per retornar el teleporter adequat.
+                // aplicam la regla del rellotge per retornar el teleporter adequat.
                 sameDistanceTeleporters.add(current);
             }
         }
 
         // Un pic emmagatzemat els teleportadors que estan a la
-        // mateixa distància, aplicarem la regla del rellotje.
+        // mateixa distància, aplicarem la regla del rellotge.
         for (Vector actual : sameDistanceTeleporters) {
             // Miram a quina meitat es troba el teletransportador.
             if (actual.getY() >= bender.getY()) {
@@ -205,7 +206,6 @@ class Bender {
             // Comprovam que la meta no estigui dins openList
             for (Cell onGoing : openList) {
                 if (onGoing.getPosition().equals(actionMap.getFinish())) {
-                    closedList.add(onGoing);
                     return onGoing.getG();
                 }
             }
